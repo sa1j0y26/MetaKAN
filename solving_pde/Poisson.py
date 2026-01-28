@@ -82,7 +82,7 @@ class MLP(nn.Module):
 class KAN(nn.Module):
     def __init__(self, layers:list, grid, k):
         super(KAN, self).__init__()
-        self.kan = KAN(layers_hidden=layers, grid_size=grid, spline_order=k)
+        self.kan = kan.KAN(layers_hidden=layers, grid_size=grid, spline_order=k)
 
     def forward(self, x):
         return ((1 - torch.sum(x**2, 1, keepdims=True)) * self.kan(x))
