@@ -334,6 +334,9 @@ def main():
     corresponding_train_metric = 0
 
 
+    if use_cuda:
+        torch.cuda.reset_peak_memory_stats(device)
+
     fvctimer = Timer()
     for epoch in range(1, args.epochs + 1):
         if fvctimer.is_paused():
@@ -366,6 +369,10 @@ def main():
     average_training_time_per_epoch = fvctimer.avg_seconds()
     logger.info(f"total training time: {total_training_time:,} seconds; average training time per epoch: {average_training_time_per_epoch:,} seconds")
 
+    gpu_peak_mb = 0.0
+    if use_cuda:
+        gpu_peak_mb = torch.cuda.max_memory_allocated(device) / (1024 ** 2)
+        logger.info(f"gpu peak memory: {gpu_peak_mb:.2f} MB")
 
     write_results(
         args,
@@ -373,7 +380,8 @@ def main():
         test_metric = best_test_metric,
         num_parameters = num_parameters,
         total_training_time = total_training_time,
-        average_training_time_per_epoch = average_training_time_per_epoch
+        average_training_time_per_epoch = average_training_time_per_epoch,
+        gpu_peak_mb = gpu_peak_mb
     )
 
     logger.info(f"training process was finished")

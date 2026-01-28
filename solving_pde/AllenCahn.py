@@ -39,6 +39,8 @@ torch.manual_seed(args.SEED)
 torch.cuda.manual_seed(args.SEED)
 np.random.seed(args.SEED)
 assert args.dataset == "Allen_Cahn"
+if torch.cuda.is_available():
+    torch.cuda.reset_peak_memory_stats(device)
 
 c = np.random.randn(1, args.dim - 1)
 const_2 = 1
@@ -313,7 +315,15 @@ if args.save_loss:
     os.makedirs("saved_loss_l2", exist_ok=True)
     model.saved_loss = np.asarray(model.saved_loss)
     model.saved_l2 = np.asarray(model.saved_l2)
-    info_dict = {"loss": model.saved_loss, "L2": model.saved_l2[:, 0], "L1": model.saved_l2[:, 1]}
+    gpu_peak_mb = 0.0
+    if torch.cuda.is_available():
+        gpu_peak_mb = torch.cuda.max_memory_allocated(device) / (1024 ** 2)
+    info_dict = {
+        "loss": model.saved_loss,
+        "L2": model.saved_l2[:, 0],
+        "L1": model.saved_l2[:, 1],
+        "GPU_peak_MB": [gpu_peak_mb] * len(model.saved_loss),
+    }
     df = pd.DataFrame(data=info_dict, index=None)
     df.to_excel(
         "saved_loss_l2/"+args.dataset+"_dim="+str(args.dim)+\

@@ -400,6 +400,9 @@ def main():
         raise NotImplementedError
     corresponding_train_metric = 0
 
+    if use_cuda:
+        torch.cuda.reset_peak_memory_stats(device)
+
     fvctimer = Timer()
     for epoch in range(1, args.epochs + 1):
         if fvctimer.is_paused():
@@ -434,6 +437,11 @@ def main():
     average_training_time_per_epoch = fvctimer.avg_seconds()
     logger.info(f"total training time: {total_training_time:,} seconds; average training time per epoch: {average_training_time_per_epoch:,} seconds")
 
+    gpu_peak_mb = 0.0
+    if use_cuda:
+        gpu_peak_mb = torch.cuda.max_memory_allocated(device) / (1024 ** 2)
+        logger.info(f"gpu peak memory: {gpu_peak_mb:.2f} MB")
+
     write_results(
         args,
         train_metric = corresponding_train_metric,
@@ -441,7 +449,8 @@ def main():
         num_parameters = num_parameters,
         flops = flops,
         total_training_time = total_training_time,
-        average_training_time_per_epoch = average_training_time_per_epoch
+        average_training_time_per_epoch = average_training_time_per_epoch,
+        gpu_peak_mb = gpu_peak_mb
     )
 
     if args.save_model:

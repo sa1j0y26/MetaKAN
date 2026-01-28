@@ -35,7 +35,7 @@ def _parse_result_line(line: str) -> dict:
     parts = [p.strip() for p in line.split(",")]
     if len(parts) < 9:
         return {"raw": line}
-    metrics = parts[-6:]
+    metrics = parts[-7:] if len(parts) >= 10 else parts[-6:]
     return {
         "raw": line,
         "timestamp": parts[0],
@@ -47,6 +47,7 @@ def _parse_result_line(line: str) -> dict:
         "flops": metrics[3],
         "total_training_time": metrics[4],
         "avg_time_per_epoch": metrics[5],
+        "gpu_peak_mb": metrics[6] if len(metrics) == 7 else None,
     }
 
 

@@ -42,6 +42,7 @@ def _read_l2(path: Path) -> dict:
         "loss": float(last.get("loss", float("nan"))),
         "L2": float(last.get("L2", float("nan"))),
         "L1": float(last.get("L1", float("nan"))),
+        "gpu_peak_mb": float(last.get("GPU_peak_MB", float("nan"))),
     }
 
 
