@@ -218,7 +218,7 @@ def main():
     args.input_size = input_size
 
     args.base_activation = get_activation(args)
-    args.activation = get_mlp_activation(args)
+    args.activation = get_mlp_activation_factory(args)
 
     model = get_model(args) 
 

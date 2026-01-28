@@ -257,18 +257,18 @@ def get_activation(args):
     else:
         raise ValueError(f'Unknown kan shortcut function: {args.base_activation}')
 
-def get_mlp_activation(args):
+def get_mlp_activation_factory(args):
     name = args.activation_name.lower()
     if name == 'gelu':
-        return nn.GELU()
+        return nn.GELU
     if name == 'relu':
-        return nn.ReLU()
+        return nn.ReLU
     if name == 'tanh':
-        return nn.Tanh()
+        return nn.Tanh
     if name == 'silu':
-        return nn.SiLU()
+        return nn.SiLU
     if name == 'identity':
-        return nn.Identity()
+        return nn.Identity
     raise ValueError(f'Unknown MLP activation: {args.activation_name}')
     
 def get_model(args):
