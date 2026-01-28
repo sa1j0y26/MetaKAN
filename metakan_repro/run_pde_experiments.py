@@ -193,14 +193,17 @@ def main() -> int:
             continue
 
         before_latest = _latest_xlsx(saved_dir)
+        before_mtime = before_latest.stat().st_mtime if before_latest else None
 
         proc = subprocess.run(run.command, cwd=str(meta_pde))
         status = proc.returncode
 
         after_latest = _latest_xlsx(saved_dir)
         result = None
-        if after_latest and after_latest != before_latest:
-            result = _read_l2(after_latest)
+        if after_latest:
+            after_mtime = after_latest.stat().st_mtime
+            if before_mtime is None or after_mtime >= before_mtime:
+                result = _read_l2(after_latest)
 
         with runs_path.open("a", encoding="utf-8") as f:
             f.write(
