@@ -266,6 +266,8 @@ model.train_adam()
 print(model.u_net)
 
 if args.save_loss:
+    import os
+    os.makedirs("saved_loss_l2", exist_ok=True)
     model.saved_loss = np.asarray(model.saved_loss)
     model.saved_l2 = np.asarray(model.saved_l2)
     info_dict = {"loss": model.saved_loss, "L2": model.saved_l2[:, 0], "L1": model.saved_l2[:, 1]}
@@ -276,4 +278,3 @@ if args.save_loss:
             +"_method="+str(args.method)+"_SEED="+str(args.SEED)+".xlsx",
         index=False
     )
-

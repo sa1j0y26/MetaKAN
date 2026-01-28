@@ -44,7 +44,7 @@ def plot_baseline(runs: List[Dict[str, Any]], out_dir: Path) -> None:
 
     plt.figure(figsize=(6, 4))
     plt.bar(labels, scores, color=["#4C78A8", "#F58518", "#54A24B"])
-    plt.ylabel("Test metric (accuracy or lower-is-better loss)")
+    plt.ylabel("Test accuracy")
     plt.title("MLP vs KAN vs MetaKAN")
     plt.tight_layout()
     out_path = out_dir / "baseline_compare.png"
@@ -64,7 +64,7 @@ def plot_hidden_dim_sweep(runs: List[Dict[str, Any]], out_dir: Path) -> None:
     plt.figure(figsize=(6, 4))
     plt.plot(x, y, marker="o", color="#E45756")
     plt.xlabel("MetaKAN hidden_dim")
-    plt.ylabel("Test metric (accuracy or lower-is-better loss)")
+    plt.ylabel("Test accuracy")
     plt.title("MetaKAN hidden_dim sweep")
     plt.tight_layout()
     out_path = out_dir / "metakan_hidden_dim_sweep.png"
