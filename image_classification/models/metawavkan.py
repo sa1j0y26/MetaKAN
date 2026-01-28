@@ -160,3 +160,6 @@ class HyperWavKAN(nn.Module):
             weights = self.hypernet(self.embeddings[l].view(-1,self.embedding_dim)).view(layer.out_features, layer.in_features, 3)
             x = layer(x, weights)
         return x
+
+# Backward-compatible alias expected by image_classification/utils.py
+MetaWavKAN = HyperWavKAN
