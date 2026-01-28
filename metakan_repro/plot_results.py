@@ -34,25 +34,36 @@ def to_float(x: str) -> float:
         return float("nan")
 
 
-def plot_baseline(runs: List[Dict[str, Any]], out_dir: Path) -> None:
+def _acc_to_error_percent(acc: float) -> float:
+    if acc != acc:
+        return acc
+    # Heuristic: if accuracy looks like a percent (e.g., 96), convert to percent error.
+    if acc > 1.5:
+        return 100.0 - acc
+    return (1.0 - acc) * 100.0
+
+
+def plot_baseline(runs: List[Dict[str, Any]], out_dir: Path, metric: str, dataset: str) -> None:
     base = [r for r in runs if r.get("group") == "baseline"]
     if not base:
         return
 
     labels = [r["model"] for r in base]
     scores = [to_float(r["result"]["test_metric"]) for r in base]
+    if metric == "error":
+        scores = [_acc_to_error_percent(s) for s in scores]
 
     plt.figure(figsize=(6, 4))
     plt.bar(labels, scores, color=["#4C78A8", "#F58518", "#54A24B"])
-    plt.ylabel("Test accuracy")
-    plt.title("MLP vs KAN vs MetaKAN")
+    plt.ylabel("Test error (%) (lower is better)" if metric == "error" else "Test accuracy")
+    plt.title(f"Image baseline ({dataset})")
     plt.tight_layout()
     out_path = out_dir / "baseline_compare.png"
     plt.savefig(out_path, dpi=150)
     plt.close()
 
 
-def plot_hidden_dim_sweep(runs: List[Dict[str, Any]], out_dir: Path) -> None:
+def plot_hidden_dim_sweep(runs: List[Dict[str, Any]], out_dir: Path, metric: str, dataset: str) -> None:
     sweep = [r for r in runs if r.get("group") == "metakan_hidden_dim"]
     if not sweep:
         return
@@ -60,12 +71,14 @@ def plot_hidden_dim_sweep(runs: List[Dict[str, Any]], out_dir: Path) -> None:
     sweep_sorted = sorted(sweep, key=lambda r: r.get("meta", {}).get("hidden_dim", 0))
     x = [r.get("meta", {}).get("hidden_dim", 0) for r in sweep_sorted]
     y = [to_float(r["result"]["test_metric"]) for r in sweep_sorted]
+    if metric == "error":
+        y = [_acc_to_error_percent(v) for v in y]
 
     plt.figure(figsize=(6, 4))
     plt.plot(x, y, marker="o", color="#E45756")
     plt.xlabel("MetaKAN hidden_dim")
-    plt.ylabel("Test accuracy")
-    plt.title("MetaKAN hidden_dim sweep")
+    plt.ylabel("Test error (%) (lower is better)" if metric == "error" else "Test accuracy")
+    plt.title(f"MetaKAN hidden_dim sweep ({dataset})")
     plt.tight_layout()
     out_path = out_dir / "metakan_hidden_dim_sweep.png"
     plt.savefig(out_path, dpi=150)
@@ -76,6 +89,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs", type=str, default=str(Path(__file__).parent / "out" / "runs.jsonl"))
     parser.add_argument("--out-dir", type=str, default=str(Path(__file__).parent / "out"))
+    parser.add_argument("--metric", choices=["accuracy", "error"], default="error")
+    parser.add_argument("--dataset", type=str, default="MNIST")
     args = parser.parse_args()
 
     runs_path = Path(args.runs)
@@ -84,8 +99,8 @@ def main() -> int:
 
     runs = load_runs(runs_path)
 
-    plot_baseline(runs, out_dir)
-    plot_hidden_dim_sweep(runs, out_dir)
+    plot_baseline(runs, out_dir, args.metric, args.dataset)
+    plot_hidden_dim_sweep(runs, out_dir, args.metric, args.dataset)
 
     print(f"Plots saved to: {out_dir}")
     return 0

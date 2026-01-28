@@ -40,6 +40,20 @@ def write_table(rows: List[Dict[str, Any]], headers: List[str], out_md: Path, ou
     out_md.write_text(md)
 
 
+def _read_num_parameters_from_xlsx(path: Path) -> float | None:
+    if not path.exists():
+        return None
+    try:
+        df = pd.read_excel(path)
+        last = df.iloc[-1]
+        value = last.get("num_parameters")
+        if value is None:
+            return None
+        return float(value)
+    except Exception:
+        return None
+
+
 def summarize_image(out_dir: Path) -> None:
     runs = load_jsonl(out_dir / "runs.jsonl")
     rows = []
@@ -93,6 +107,9 @@ def summarize_pde(out_dir: Path, dataset: str) -> None:
         if r.get("event") != "run" or not r.get("result"):
             continue
         res = r["result"]
+        num_parameters = res.get("num_parameters")
+        if num_parameters is None and res.get("file"):
+            num_parameters = _read_num_parameters_from_xlsx(Path(res["file"]))
         rows.append(
             {
                 "dataset": r.get("dataset"),
@@ -100,11 +117,12 @@ def summarize_pde(out_dir: Path, dataset: str) -> None:
                 "group": r.get("group"),
                 "L2": res.get("L2"),
                 "L1": res.get("L1"),
+                "num_parameters": num_parameters,
                 "gpu_peak_mb": res.get("gpu_peak_mb"),
             }
         )
 
-    headers = ["dataset", "model", "group", "L2", "L1", "gpu_peak_mb"]
+    headers = ["dataset", "model", "group", "L2", "L1", "num_parameters", "gpu_peak_mb"]
     write_table(rows, headers, out_dir / f"pde_{dataset}_summary.md", out_dir / f"pde_{dataset}_summary.csv")
 
 

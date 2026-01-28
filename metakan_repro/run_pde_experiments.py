@@ -37,11 +37,17 @@ def _latest_xlsx(saved_dir: Path) -> Optional[Path]:
 def _read_l2(path: Path) -> dict:
     df = pd.read_excel(path)
     last = df.iloc[-1]
+    num_parameters = last.get("num_parameters", float("nan"))
+    try:
+        num_parameters = float(num_parameters)
+    except Exception:
+        num_parameters = float("nan")
     return {
         "file": str(path),
         "loss": float(last.get("loss", float("nan"))),
         "L2": float(last.get("L2", float("nan"))),
         "L1": float(last.get("L1", float("nan"))),
+        "num_parameters": num_parameters,
         "gpu_peak_mb": float(last.get("GPU_peak_MB", float("nan"))),
     }
 
