@@ -39,7 +39,7 @@ torch.manual_seed(args.SEED)
 torch.cuda.manual_seed(args.SEED)
 np.random.seed(args.SEED)
 assert args.dataset == "Allen_Cahn"
-if torch.cuda.is_available():
+if torch.cuda.is_available() and device.type == "cuda":
     torch.cuda.reset_peak_memory_stats(device)
 
 c = np.random.randn(1, args.dim - 1)
@@ -316,7 +316,7 @@ if args.save_loss:
     model.saved_loss = np.asarray(model.saved_loss)
     model.saved_l2 = np.asarray(model.saved_l2)
     gpu_peak_mb = 0.0
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and device.type == "cuda":
         gpu_peak_mb = torch.cuda.max_memory_allocated(device) / (1024 ** 2)
     info_dict = {
         "loss": model.saved_loss,
