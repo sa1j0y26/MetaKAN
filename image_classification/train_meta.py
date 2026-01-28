@@ -273,6 +273,7 @@ def main():
 
     args.output_size = num_classes
     args.input_size = input_size
+    args.input_dim = input_size
 
     args.base_activation = get_activation(args)
 
