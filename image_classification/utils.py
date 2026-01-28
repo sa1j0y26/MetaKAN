@@ -256,6 +256,20 @@ def get_activation(args):
         return Zero()
     else:
         raise ValueError(f'Unknown kan shortcut function: {args.base_activation}')
+
+def get_mlp_activation(args):
+    name = args.activation_name.lower()
+    if name == 'gelu':
+        return nn.GELU()
+    if name == 'relu':
+        return nn.ReLU()
+    if name == 'tanh':
+        return nn.Tanh()
+    if name == 'silu':
+        return nn.SiLU()
+    if name == 'identity':
+        return nn.Identity()
+    raise ValueError(f'Unknown MLP activation: {args.activation_name}')
     
 def get_model(args):
     if args.model == "MLP":
