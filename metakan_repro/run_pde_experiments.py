@@ -170,7 +170,7 @@ def main() -> int:
     parser.add_argument("--out-dir", type=str, default=str(Path(__file__).parent / "out"))
     args = parser.parse_args()
 
-    meta_root = Path(args.meta_root) if args.meta_root else (Path(__file__).parent.parent / "MetaKAN")
+    meta_root = Path(args.meta_root) if args.meta_root else Path(__file__).parent.parent
     meta_pde = meta_root / "solving_pde"
     saved_dir = meta_pde / "saved_loss_l2"
 

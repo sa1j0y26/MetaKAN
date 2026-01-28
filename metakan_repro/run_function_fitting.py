@@ -227,7 +227,7 @@ def main() -> int:
     parser.add_argument("--out-dir", type=str, default=str(Path(__file__).parent / "out"))
     args = parser.parse_args()
 
-    meta_root = Path(args.meta_root) if args.meta_root else (Path(__file__).parent.parent / "MetaKAN")
+    meta_root = Path(args.meta_root) if args.meta_root else Path(__file__).parent.parent
     meta_ff = meta_root / "function_fitting"
     results_csv = meta_root / "results" / "results.csv"
 
